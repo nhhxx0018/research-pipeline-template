@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实验进展 · Experiments</title>
+<style>
+  :root{
+    --bg:#F5F6F8; --card:#fff; --line:#E6E8EC; --ink:#111827; --muted:#6B7280; --faint:#9CA3AF;
+    --accent:#8B5CF6; --up:#10B981; --down:#EF4444;
+    --radius:14px; --shadow:0 2px 10px rgba(11,18,32,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Segoe UI','Microsoft YaHei',Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 64px}
+  .kicker{font-size:13px;font-weight:600;color:var(--faint);letter-spacing:2px;margin:0 0 6px}
+  h1{font-size:30px;font-weight:800;margin:0}
+  .sub{color:var(--muted);margin:6px 0 0;font-size:15px}
+  .nav{margin:8px 0 0;font-size:13.5px;font-weight:700}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+  .stats{display:flex;gap:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+    padding:12px 18px;text-align:center;min-width:88px}
+  .stat b{display:block;font-size:24px;font-weight:800}
+  .stat span{font-size:11px;color:var(--faint)}
+  .seclabel{font-size:14px;font-weight:700;color:#374151;letter-spacing:.5px;margin:30px 0 12px}
+
+  .projtabs{display:flex;gap:8px;flex-wrap:wrap}
+  .ptab{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 16px;font-weight:700;
+    font-size:14px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow)}
+  .ptab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .ptab small{display:block;font-weight:500;font-size:11px;opacity:.8}
+
+  .projhead{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin:14px 0 20px}
+  .projhead h2{margin:0;font-size:20px}
+  .projhead .goal{margin:8px 0 0;font-size:14.5px;color:#374151}
+  .projhead .meta{margin:12px 0 0;display:flex;gap:10px;flex-wrap:wrap;font-size:13px}
+  .pill{border-radius:999px;padding:5px 12px;font-weight:700;font-size:12.5px}
+  .pill.base{background:#EEF0F3;color:#475569}
+  .pill.best{background:#DCFCE7;color:#166534}
+  .desc{margin:10px 0 0;font-size:13.5px;color:var(--muted)}
+
+  .timeline{position:relative;margin-left:6px;padding-left:24px;border-left:2px solid #E6E8EC}
+  .run{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px;margin-bottom:16px}
+  .run::before{content:"";position:absolute;left:-31px;top:22px;width:12px;height:12px;border-radius:50%;
+    background:var(--accent);border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .run-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .run-id{font-weight:800;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px}
+  .run-date{color:var(--faint);font-size:12.5px;margin-left:8px}
+  .bdg{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .s-done{background:#DCFCE7;color:#166534}.s-running{background:#FEF3C7;color:#92400E}
+  .s-failed{background:#FEE2E2;color:#B91C1C}.s-queued{background:#F1F5F9;color:#475569}
+  .metrics{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+  .metric{background:#F1F5F9;border-radius:8px;padding:6px 11px;font-size:12.5px;color:#475569}
+  .metric b{color:var(--ink);font-size:14px;margin-left:4px}
+  .metric.primary{background:#EEF2FF;color:#3730A3}.metric.primary b{color:#3730A3}
+  .metric.up{background:#ECFDF5;color:#065F46}.metric.up b{color:var(--up)}
+  .metric.down{background:#FEF2F2;color:#991B1B}.metric.down b{color:var(--down)}
+  .sec{margin-top:12px}
+  .seclbl{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:1px}
+  .sectxt{font-size:13.5px;color:#374151;margin-top:3px;white-space:pre-wrap}
+  .sec.accent{background:#FEF9EC;border:1px solid #F4D690;border-radius:10px;padding:10px 13px}
+  .sec.accent .seclbl{color:#B45309}.sec.accent .sectxt{color:#92400E}
+  .exfig{margin:8px 0 4px}
+  .exfig img{max-width:100%;height:auto;border:1px solid #d8dee8;border-radius:6px;display:block;cursor:zoom-in;background:#fff}
+  .exfig figcaption{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.35}
+  .empty{text-align:center;color:var(--faint);padding:40px;font-size:15px}
+  footer{margin-top:30px;color:var(--faint);font-size:12.5px;line-height:1.7}
+  #app-error{display:none;background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;border-radius:12px;padding:16px 18px;margin:20px 0}
+  @media (max-width:640px){ h1{font-size:24px} .wrap{padding:18px 14px 50px} }
+  /* ---- 实验计划 plan feature ---- */
+  .plan-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;font-size:13px;font-weight:700;color:#374151;cursor:pointer}
+  .btn:hover{background:#F8FAFC}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .plan-group{margin-bottom:16px}
+  .plan-gh{font-size:13px;font-weight:800;color:#374151;letter-spacing:.5px;margin:0 0 8px}
+  .plan-gn{color:var(--faint);font-weight:600;margin-left:5px}
+  .plan-card{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:10px}
+  .plan-card.hot{border-color:#F4D690;box-shadow:0 0 0 2px #FEF3C7}
+  .pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .pc-title{font-weight:800;font-size:14.5px}
+  .pc-badges{display:flex;gap:6px;flex:0 0 auto}
+  .pbdg{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .pbdg.pri{background:#EEF2FF;color:#3730A3}
+  .pc-meta{font-size:12px;color:var(--faint);margin-top:5px}
+  .pc-tests{font-size:13px;color:#374151;margin-top:7px}
+  .pc-note{font-size:12.5px;color:var(--muted);margin-top:5px;background:#F8FAFC;border-radius:8px;padding:6px 9px;white-space:pre-wrap}
+  .pc-actions{margin-top:9px;display:flex;gap:14px}
+  .lnk{border:none;background:none;color:var(--accent);font-weight:700;font-size:12.5px;cursor:pointer;padding:0}
+  .plan-form{background:#fff;border:1.5px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:14px;margin-bottom:10px}
+  .pf{display:block;margin-bottom:8px}
+  .pf>span{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+  .pf input,.pf select,.pf textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13.5px;font-family:inherit;box-sizing:border-box}
+  .pf-row{display:flex;gap:10px}.pf-row .pf{flex:1}
+  .pf-btns{display:flex;gap:8px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app-error">⚠️ 没读到数据。请运行 <b>python3 dashboard/build-experiments.py</b> 后再打开。</div>
+
+  <div class="head">
+    <div>
+      <p class="kicker">EXPERIMENTS · 实验进展</p>
+      <h1>实验进展 · Experiments</h1>
+      <p class="sub">项目中心的工作台 · 实验 → 想法 → 定向读论文 → 下一个实验</p>
+      <p class="nav"><a href="pipeline.html">← 流水线总览 / Pipeline</a></p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="seclabel">项目 / PROJECTS</div>
+  <div class="projtabs" id="projtabs"></div>
+  <div id="projpanel"></div>
+
+  <div class="seclabel" style="margin-top:34px">实验计划 / PLAN <span style="font-weight:400;color:var(--faint);font-size:13px">（可直接编辑 · 本地 localStorage 保存 · 导出可入库）</span></div>
+  <div class="plan-toolbar">
+    <button class="btn primary" id="plan-new">+ 新建</button>
+    <button class="btn" id="plan-export">⬇ 导出 plan.json</button>
+    <button class="btn" id="plan-import">⬆ 导入</button>
+    <button class="btn" id="plan-reset">↺ 恢复默认</button>
+  </div>
+  <div id="planbody"></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<!-- DATA:START -->
+<script id="exp-data" type="application/json">
+{
+  "projects": [
+    {
+      "name": "示例项目 / Example Project",
+      "slug": "example-project",
+      "goal": "（一句话说清这个项目要验证什么——会显示在看板项目头）",
+      "baseline": "（你的对照 / baseline）",
+      "metric_key": "success_rate",
+      "metric_goal": "max",
+      "desc": "演示 `05-experiments/<项目>/` 的结构:一个 `project.md` + 一个 `runs/` 目录。把你的真实项目照这个格式建目录即可。",
+      "runs": [
+        {
+          "run": "r0-example",
+          "date": "2026-01-01",
+          "status": "done",
+          "metrics": {
+            "success_rate": 0.42,
+            "vs_baseline": "+0.05"
+          },
+          "sections": {
+            "观察": "（这次实验看到了什么——用自己的话一两句。frontmatter 里 **不要写行内 # 注释**,解析器会把注释并进数值。）",
+            "下一步想法": "（基于观察,下一步打算做什么。)",
+            "要读的论文": "（这次实验引出要读的论文。)",
+            "图": "![示例图:PNG 放 runs/figures/ 下,这样就内联显示](figures/example.png)"
+          }
+        }
+      ],
+      "best": {
+        "run": "r0-example",
+        "metric": 0.42
+      }
+    }
+  ]
+}
+</script>
+<!-- DATA:END -->
+
+<script>
+(function(){
+  var node = document.getElementById('exp-data');
+  var data = null;
+  try { data = JSON.parse((node.textContent||'').trim()); } catch(e){}
+  if(!data || !data.projects || !data.projects.length){ document.getElementById('app-error').style.display='block'; return; }
+
+  var esc = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var state = { proj: 0 };
+
+  var totalRuns = data.projects.reduce(function(a,p){return a+p.runs.length;},0);
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><b>'+data.projects.length+'</b><span>projects</span></div>'+
+    '<div class="stat"><b>'+totalRuns+'</b><span>runs</span></div>';
+  document.getElementById('footer').innerHTML =
+    '数据来源：<b>05-experiments/&lt;项目&gt;/runs/*.md</b> → <b>python3 dashboard/build-experiments.py</b> 生成。<br>'+
+    '新增实验：把(本地/集群)机器产出的 md 丢进对应项目 runs/，跑一下脚本即可刷新本板。';
+
+  function renderTabs(){
+    document.getElementById('projtabs').innerHTML = data.projects.map(function(p,i){
+      return '<button class="ptab'+(i===state.proj?' active':'')+'" data-i="'+i+'">'+esc(p.name)+
+        '<small>'+p.runs.length+' runs</small></button>';
+    }).join('');
+    document.querySelectorAll('.ptab').forEach(function(b){
+      b.addEventListener('click', function(){ state.proj=parseInt(b.dataset.i,10); renderTabs(); renderPanel(); });
+    });
+  }
+
+  function metricChip(k,v,primaryKey){
+    var cls='metric';
+    var sv=String(v);
+    if(k===primaryKey) cls='metric primary';
+    else if(/^\+/.test(sv) || k==='vs_baseline') cls='metric up';
+    else if(/^-/.test(sv)) cls='metric down';
+    return '<span class="'+cls+'">'+esc(k)+'<b>'+esc(v)+'</b></span>';
+  }
+
+  // 把 section 里的 markdown 图 ![cap](figures/x.png) 渲染成缩略图（点开看大图），其余文字转义
+  function renderSecHTML(txt, slug){
+    var imgLine = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+    var lines = String(txt==null?'':txt).split('\n');
+    if(!lines.some(function(l){ return imgLine.test(l.trim()); })) return esc(txt);
+    return lines.map(function(l){
+      var s = l.trim(), m = s.match(imgLine);
+      if(m){
+        var cap=m[1], path=m[2], src=path;
+        if(!/^(https?:|\/|\.\.\/)/.test(path)) src='../05-experiments/'+slug+'/runs/'+path;
+        return '<figure class="exfig"><a href="'+esc(src)+'" target="_blank" rel="noopener">'+
+               '<img src="'+esc(src)+'" alt="'+esc(cap)+'" loading="lazy"></a>'+
+               (cap?'<figcaption>'+esc(cap)+'</figcaption>':'')+'</figure>';
+      }
+      return s ? '<div>'+esc(l)+'</div>' : '';
+    }).join('');
+  }
+
+  function renderPanel(){
+    var p = data.projects[state.proj];
+    var best = p.best ? '<span class="pill best">最佳 '+esc(p.metric_key)+' = '+esc(p.best.metric)+'（'+esc(p.best.run)+'）</span>' : '';
+    var head = '<div class="projhead"><h2>'+esc(p.name)+'</h2>'+
+      (p.goal?'<p class="goal">🎯 '+esc(p.goal)+'</p>':'')+
+      '<div class="meta"><span class="pill base">baseline: '+esc(p.baseline||'—')+'</span>'+best+'</div>'+
+      (p.desc?'<p class="desc">'+esc(p.desc)+'</p>':'')+'</div>';
+
+    var order=['观察','下一步想法','要读的论文'];
+    var runs = p.runs.slice(); // 时间线：最早在前（数据生成排最上）
+    var body = runs.length ? '<div class="timeline">'+runs.map(function(r){
+      var st = (r.status||'').toLowerCase();
+      var stCls = ({done:'s-done',running:'s-running',failed:'s-failed',queued:'s-queued'})[st]||'s-queued';
+      var metrics = Object.keys(r.metrics||{}).map(function(k){ return metricChip(k, r.metrics[k], p.metric_key); }).join('');
+      var keys = order.filter(function(k){return r.sections && r.sections[k];})
+                  .concat(Object.keys(r.sections||{}).filter(function(k){return order.indexOf(k)<0;}));
+      var secs = keys.map(function(k){
+        var acc = (k.indexOf('想法')>=0 || k.indexOf('读')>=0) ? ' accent' : '';
+        return '<div class="sec'+acc+'"><div class="seclbl">'+esc(k)+'</div><div class="sectxt">'+renderSecHTML(r.sections[k], p.slug)+'</div></div>';
+      }).join('');
+      return '<div class="run"><div class="run-head"><div><span class="run-id">'+esc(r.run)+'</span>'+
+        '<span class="run-date">'+esc(r.date)+'</span></div><span class="bdg '+stCls+'">'+esc(r.status||'—')+'</span></div>'+
+        (metrics?'<div class="metrics">'+metrics+'</div>':'')+secs+'</div>';
+    }).join('')+'</div>' : '<div class="empty">这个项目还没有 run。把机器产出的 md 丢进 05-experiments/'+esc(p.slug)+'/runs/ 再跑 build-experiments.py。</div>';
+
+    document.getElementById('projpanel').innerHTML = head + body;
+  }
+
+  renderTabs(); renderPanel();
+})();
+</script>
+
+<script>
+(function(){
+  var KEY='aerialcot.plan.v1';
+  var SEED=[
+    {id:'now', title:'（今天在做的实验 — 回来填）', dates:'', status:'进行中', priority:'P0', owner:'', tests:'把正在跑的实验写这里：假设 / 参考哪篇方法 / 看什么指标', note:''},
+    {id:'next', title:'（下一个想做的实验）', dates:'', status:'计划', priority:'P1', owner:'', tests:'要验证什么、怎么验证', note:'相关待读论文记到 vault'},
+    {id:'done1', title:'（一个已完成的实验示例）', dates:'', status:'完成', priority:'P0', owner:'', tests:'做了什么、结论是什么', note:'关键数字 / 结论一句话'}
+  ];
+  var STATUS=['进行中','计划','完成','搁置'];
+  var SCOLOR={'进行中':['#FEF3C7','#92400E'],'计划':['#E0E7FF','#3730A3'],'完成':['#DCFCE7','#166534'],'搁置':['#F1F5F9','#64748B']};
+  var PRI=['','P0','P1','P2','P3'];
+  var esc=function(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');};
+  var items;
+  try{ var raw=localStorage.getItem(KEY); items = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(SEED)); }
+  catch(e){ items = JSON.parse(JSON.stringify(SEED)); }
+  var editing=null;
+  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(items)); }catch(e){} }
+  function within2(dates){
+    var m=(dates||'').match(/(\d{1,2})-(\d{1,2})/); if(!m) return false;
+    var now=new Date(); var y=now.getFullYear();
+    var t=new Date(y, now.getMonth(), now.getDate());
+    var d=new Date(y, parseInt(m[1],10)-1, parseInt(m[2],10));
+    var diff=(d-t)/86400000; return diff>=-0.5 && diff<=2.5;
+  }
+  var planbody=document.getElementById('planbody');
+  function render(){
+    var html='';
+    if(editing==='__new__') html+=formHtml({id:'__new__',status:'计划',priority:'P0'});
+    STATUS.forEach(function(st){
+      var g=items.filter(function(it){return it.status===st;});
+      if(!g.length) return;
+      html+='<div class="plan-group"><div class="plan-gh">'+st+'<span class="plan-gn">'+g.length+'</span></div>';
+      g.forEach(function(it){ html += (editing===it.id) ? formHtml(it) : cardHtml(it); });
+      html+='</div>';
+    });
+    planbody.innerHTML=html;
+    planbody.querySelectorAll('[data-act]').forEach(function(b){
+      b.addEventListener('click', function(){ act(b.getAttribute('data-act'), b.getAttribute('data-id'), b); });
+    });
+  }
+  function cardHtml(it){
+    var sc=SCOLOR[it.status]||['#eee','#333']; var hot=within2(it.dates);
+    return '<div class="plan-card'+(hot?' hot':'')+'">'+
+      '<div class="pc-top"><div class="pc-title">'+esc(it.title||'(未命名)')+'</div><div class="pc-badges">'+
+        (it.priority?'<span class="pbdg pri">'+esc(it.priority)+'</span>':'')+
+        '<span class="pbdg" style="background:'+sc[0]+';color:'+sc[1]+'">'+esc(it.status)+'</span></div></div>'+
+      '<div class="pc-meta">'+(it.dates?'🗓 '+esc(it.dates):'')+(it.owner?'　· '+esc(it.owner):'')+(hot?'　<b style="color:#B45309">🔥 这两天</b>':'')+'</div>'+
+      (it.tests?'<div class="pc-tests">'+esc(it.tests)+'</div>':'')+
+      (it.note?'<div class="pc-note">'+esc(it.note)+'</div>':'')+
+      '<div class="pc-actions"><button class="lnk" data-act="edit" data-id="'+esc(it.id)+'">✏️ 编辑</button>'+
+        '<button class="lnk" data-act="del" data-id="'+esc(it.id)+'">🗑 删除</button></div></div>';
+  }
+  function fld(label,name,val,ta){ val=esc(val||'');
+    return ta ? '<label class="pf"><span>'+label+'</span><textarea data-f="'+name+'" rows="2">'+val+'</textarea></label>'
+              : '<label class="pf"><span>'+label+'</span><input data-f="'+name+'" value="'+val+'"></label>'; }
+  function selF(label,name,val,opts){
+    return '<label class="pf"><span>'+label+'</span><select data-f="'+name+'">'+
+      opts.map(function(x){return '<option'+(x===(val||'')?' selected':'')+'>'+(x||'(无)')+'</option>';}).join('')+'</select></label>'; }
+  function formHtml(it){
+    return '<div class="plan-form">'+
+      fld('标题','title',it.title)+
+      '<div class="pf-row">'+fld('日期（如 06-04 或 06-04→06-06）','dates',it.dates)+selF('状态','status',it.status,STATUS)+'</div>'+
+      '<div class="pf-row">'+selF('优先级','priority',it.priority,PRI)+fld('负责 / 资源','owner',it.owner)+'</div>'+
+      fld('验证什么 / 假设','tests',it.tests,1)+
+      fld('备注 / 指标','note',it.note,1)+
+      '<div class="pf-btns"><button class="btn primary" data-act="save" data-id="'+esc(it.id)+'">保存</button>'+
+        '<button class="btn" data-act="cancel" data-id="">取消</button></div></div>';
+  }
+  function act(a,id,btn){
+    if(a==='edit'){ editing=id; render(); }
+    else if(a==='cancel'){ editing=null; render(); }
+    else if(a==='del'){ if(confirm('删除这条计划？')){ items=items.filter(function(x){return x.id!==id;}); persist(); render(); } }
+    else if(a==='save'){
+      var form=btn.closest('.plan-form'); var o={};
+      form.querySelectorAll('[data-f]').forEach(function(el){ var v=el.value.trim(); o[el.getAttribute('data-f')]=(v==='(无)'?'':v); });
+      if(id==='__new__'){ o.id='p'+Date.now(); items.unshift(o); }
+      else { for(var i=0;i<items.length;i++){ if(items[i].id===id){ o.id=id; items[i]=o; break; } } }
+      editing=null; persist(); render();
+    }
+  }
+  document.getElementById('plan-new').addEventListener('click', function(){ editing='__new__'; render(); });
+  document.getElementById('plan-reset').addEventListener('click', function(){ if(confirm('恢复默认种子？会覆盖你的本地编辑。')){ items=JSON.parse(JSON.stringify(SEED)); persist(); render(); } });
+  document.getElementById('plan-export').addEventListener('click', function(){
+    var txt=JSON.stringify(items,null,2);
+    try{ if(navigator.clipboard) navigator.clipboard.writeText(txt); }catch(e){}
+    try{ var b=new Blob([txt],{type:'application/json'}); var a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='plan.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},1500); }catch(e){ alert('导出失败'); }
+  });
+  document.getElementById('plan-import').addEventListener('click', function(){
+    var inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
+    inp.addEventListener('change', function(){ var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader();
+      r.onload=function(){ try{ var arr=JSON.parse(r.result); if(Array.isArray(arr)){ items=arr; persist(); render(); } else alert('JSON 顶层应是数组'); }catch(e){ alert('解析失败：'+e); } };
+      r.readAsText(f); });
+    inp.click();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "title": "Research Pipeline",
+    "field": "（你的研究方向）· 前期文献调研 / 实验追踪 — 模板",
+    "owner": "（你的名字 / your name）",
+    "generated": "2026-06-02",
+    "skills_dir": ".claude/skills/",
+    "note": "看板从本文件读取渲染。以后只改这个 JSON，再跑 python3 dashboard/build.py 即可刷新看板。所有 note_path 路径相对项目根目录。",
+    "project": "（项目名占位）"
+  },
+  "status_legend": [
+    "待读",
+    "已调研",
+    "精读中",
+    "已笔记"
+  ],
+  "priority_legend": [
+    "High",
+    "Med",
+    "Low"
+  ],
+  "stages": [
+    {
+      "id": 1,
+      "name": "综合科研 & 综述",
+      "short": "综合科研",
+      "en": "REVIEW",
+      "dir": "01-review/",
+      "description": "选题、文献综述、论文规划、模拟审稿。",
+      "skills": [
+        {
+          "name": "academic-research-suite",
+          "repo": "Imbad0202/academic-research-skills-codex",
+          "url": "https://github.com/Imbad0202/academic-research-skills-codex",
+          "status": "installed",
+          "use": "学术研究套件：综述/选题/写作/模拟审稿/流程（含 /ars-* 命令别名；也含实验规划/统计解读）"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "文献雷达 & 文献库",
+      "short": "文献雷达",
+      "en": "RADAR",
+      "dir": "02-radar/",
+      "description": "按关键词监控 arXiv / Crossref / OpenAlex，把重点论文沉淀为本地可视化文献库。",
+      "skills": [
+        {
+          "name": "daily-literature-digest",
+          "repo": "xuezheng627/daily-literature-digest-skill",
+          "url": "https://github.com/xuezheng627/daily-literature-digest-skill",
+          "status": "installed",
+          "use": "按关键词监控 arXiv/Crossref/OpenAlex，发每日文献日报（Gmail 需自配）"
+        },
+        {
+          "name": "paper-vault",
+          "repo": "xuezheng627/research-radar-paper-vault",
+          "url": "https://github.com/xuezheng627/research-radar-paper-vault",
+          "status": "installed",
+          "use": "把重点论文沉淀为本地可搜索的卡片式文献库"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "文献下载",
+      "short": "文献下载",
+      "en": "ACQUIRE",
+      "dir": "03-acquired/",
+      "description": "在学校/机构合法权限内获取全文。两个 skill 只装不跑，由你手动触发，不绕过登录/付费墙。",
+      "skills": [
+        {
+          "name": "literature-downloader",
+          "repo": "Lucaswangzcx/literature-downloader-skill",
+          "url": "https://github.com/Lucaswangzcx/literature-downloader-skill",
+          "status": "installed-norun",
+          "use": "中文文献检索 + 合法全文获取（手动触发）"
+        },
+        {
+          "name": "sciencedirect-live-session-fetcher",
+          "repo": "Given-Dream/sciencedirect-live-session-fetcher",
+          "url": "https://github.com/Given-Dream/sciencedirect-live-session-fetcher",
+          "status": "installed-norun",
+          "use": "用你已登录的浏览器会话取 ScienceDirect PDF（手动触发）"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "文献精读",
+      "short": "文献精读",
+      "en": "READ",
+      "dir": "04-reading/",
+      "description": "解析 PDF、建本地文献库、产出证据驱动的精读笔记（HTML/MD）。",
+      "skills": [
+        {
+          "name": "auto-paper-skill",
+          "repo": "Zachary709/AutoPaperSkill",
+          "url": "https://github.com/Zachary709/AutoPaperSkill",
+          "status": "installed",
+          "use": "按方向/会议/DOI 找论文、去重、存库、解析 PDF 出报告"
+        },
+        {
+          "name": "literature-workflow",
+          "repo": "hwang847/codex-paper-reader",
+          "url": "https://github.com/hwang847/codex-paper-reader",
+          "status": "installed",
+          "use": "管理本地 PDF 文件夹、建索引、生成 HTML 精读笔记"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "实验 & 复现",
+      "short": "实验复现",
+      "en": "EXPERIMENT",
+      "dir": "05-experiments/",
+      "description": "复现基线、实现/调试方法、跑实验与消融、分析结果。注：真正的训练/仿真/eval 是你自己的代码库，本阶段 skill 负责「组织与驱动」实验，不替代训练栈。",
+      "skills": [
+        {
+          "name": "codex-autoresearch",
+          "repo": "leo-lilinxiao/codex-autoresearch",
+          "url": "https://github.com/leo-lilinxiao/codex-autoresearch",
+          "status": "installed",
+          "use": "无人值守的「改→验→留/弃」循环：复现、调参、跑到指标达标、通宵实验（harness 风格）"
+        },
+        {
+          "name": "results-analysis",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "分析实验结果、校验对比、把 eval 输出转成可入文的结果文字/图表/结论"
+        }
+      ],
+      "more_available": "重训练/仿真/eval 用你自己的代码库；可再补装 codex-academic 系实验 skill"
+    },
+    {
+      "id": 6,
+      "name": "写作 & 润色",
+      "short": "写作润色",
+      "en": "WRITE",
+      "dir": "06-writing/",
+      "description": "LaTeX/arXiv 与会议稿写作、科学写作规范、润色去 AI 味、reviewer 视角自检。",
+      "skills": [
+        {
+          "name": "arxiv-paper-writer",
+          "repo": "renocrypt/latex-arxiv-SKILL",
+          "url": "https://github.com/renocrypt/latex-arxiv-SKILL",
+          "status": "installed",
+          "use": "用 IEEEtran 写 arXiv 的 ML/AI 综述，管好 BibTeX 引用"
+        },
+        {
+          "name": "scientific-writing",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "按期刊规范写/改 manuscript 段落、摘要、图注"
+        },
+        {
+          "name": "conference-paper-writing",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "写/改 NeurIPS/ICML/ICLR/ACL/AAAI/COLM 风格会议论文"
+        },
+        {
+          "name": "paper-reviewer",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "以审稿人视角给稿子写 formal review"
+        },
+        {
+          "name": "awesome-ai-research-writing",
+          "repo": "zengrong233/awesome-ai-research-writing-skill",
+          "url": "https://github.com/zengrong233/awesome-ai-research-writing-skill",
+          "status": "installed",
+          "use": "中英写作/翻译/润色/去 AI 味/长句解释/reviewer 自检"
+        }
+      ],
+      "more_available": "Boom5426/Nature-Paper-Skills 另有 14 个子 skill；AAASS554/codex-academic-paper-skills 未装（精选取舍）"
+    },
+    {
+      "id": 7,
+      "name": "参考文献 & 展示",
+      "short": "参考展示",
+      "en": "DELIVER",
+      "dir": "07-delivery/",
+      "description": "参考文献与 BibTeX/RIS 格式化，论文汇报 PPT 生成。",
+      "skills": [
+        {
+          "name": "chinese-reference-formatter-skill",
+          "repo": "Zechang-Xiong/chinese-reference-formatter-skill",
+          "url": "https://github.com/Zechang-Xiong/chinese-reference-formatter-skill",
+          "status": "installed",
+          "use": "GB/T 7714 中文参考文献 + BibTeX 补全"
+        },
+        {
+          "name": "citation-ris-downloader",
+          "repo": "LiOH-1228/citation-ris-downloader",
+          "url": "https://github.com/LiOH-1228/citation-ris-downloader",
+          "status": "installed",
+          "use": "下载/校验/整理 RIS → Zotero/EndNote/Mendeley"
+        },
+        {
+          "name": "academic-slide-minimalist",
+          "repo": "fangyuanopus/literature-report-ppt-builder",
+          "url": "https://github.com/fangyuanopus/literature-report-ppt-builder",
+          "status": "adapted",
+          "use": "论文→文献汇报 PPT（≥20 页、只用论文真实图）"
+        }
+      ],
+      "more_available": "zxzin/codex-academic-delivery-skills（pptpro/final-delivery-clean 等）未装（精选取舍）"
+    }
+  ],
+  "papers": [
+    {
+      "id": "ecot-2024",
+      "title": "Robotic Control via Embodied Chain-of-Thought Reasoning (ECoT)",
+      "authors": "Zawalski, Chen, Pertsch, Mees, Finn, Levine",
+      "year": 2024,
+      "venue": "CoRL 2024",
+      "url": "https://arxiv.org/abs/2407.08693",
+      "stage": 4,
+      "status": "已笔记",
+      "priority": "High",
+      "topic": "具身推理 / Embodied Reasoning",
+      "tags": [
+        "ECoT",
+        "chain-of-thought",
+        "reasoning",
+        "VLA"
+      ],
+      "note_path": "04-reading/ecot-notes.md",
+      "detail": {
+        "fact": "ECoT:在 VLA 输出动作前,显式生成一段「具身推理链」(任务→子任务→可见物体→夹爪位置→运动方向),据此再出动作,把高层语义接地到低层控制;在 OpenVLA 上泛化任务绝对成功率 +28%,且不需额外机器人数据。",
+        "mytake": "（读完写你自己的判断：能偷什么、哪里不认同）"
+      },
+      "project": "示例 / example"
+    },
+    {
+      "id": "drivelm-2024",
+      "title": "DriveLM: Driving with Graph Visual Question Answering",
+      "authors": "Sima et al.",
+      "year": 2024,
+      "venue": "ECCV 2024",
+      "url": "https://arxiv.org/abs/2312.14150",
+      "stage": 2,
+      "status": "已调研",
+      "priority": "High",
+      "topic": "推理链监督 / Reasoning-Chain Supervision",
+      "tags": [
+        "driving",
+        "graph-VQA"
+      ],
+      "detail": {
+        "fact": "DriveLM:把驾驶决策组织成图结构的视觉问答(感知→预测→规划的推理链),证明「先推理再行动」在自动驾驶上有效;基于 nuScenes / CARLA 构建 DriveLM-Data 基准。",
+        "mytake": "（读完写你自己的判断：能偷什么、哪里不认同）"
+      },
+      "project": "示例 / example"
+    }
+  ]
+}

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Pipeline · Template</title>
+<style>
+  :root{
+    --bg:#F5F6F8; --card:#fff; --line:#E6E8EC; --ink:#111827; --muted:#6B7280; --faint:#9CA3AF;
+    --s1:#4F46E5; --s2:#0EA5E9; --s3:#F59E0B; --s4:#EF4444; --s5:#8B5CF6; --s6:#10B981;
+    --radius:14px; --shadow:0 2px 10px rgba(11,18,32,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Segoe UI','Microsoft YaHei',Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--s1);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
+  .kicker{font-size:13px;font-weight:600;color:var(--faint);letter-spacing:2px;margin:0 0 6px}
+  h1{font-size:32px;font-weight:800;margin:0}
+  .sub{color:var(--muted);margin:6px 0 0;font-size:15.5px}
+  .seclabel{font-size:14px;font-weight:700;color:#374151;letter-spacing:.5px;margin:30px 0 12px}
+  .seclabel .hint{font-weight:400;color:var(--faint);font-size:13px}
+
+  /* header */
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap}
+  .stats{display:flex;gap:12px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+    padding:12px 18px;text-align:center;min-width:84px}
+  .stat b{display:block;font-size:24px;font-weight:800}
+  .stat span{font-size:11px;color:var(--faint)}
+
+  /* flow */
+  .flow{display:flex;gap:6px;align-items:stretch;overflow-x:auto;padding:4px 2px 10px}
+  .node{flex:1 1 0;min-width:132px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 14px 12px;cursor:pointer;
+    position:relative;transition:transform .08s ease}
+  .node:hover{transform:translateY(-2px)}
+  .node .num{width:28px;height:28px;border-radius:50%;color:#fff;font-weight:800;font-size:14px;
+    display:flex;align-items:center;justify-content:center}
+  .node .nm{font-size:14px;font-weight:800;margin-top:8px}
+  .node .en{font-size:10px;color:var(--faint);letter-spacing:1px}
+  .node .cnt{font-size:11px;font-weight:700;margin-top:8px}
+  .node.active{transform:translateY(-2px)}
+  .arrow{flex:0 0 auto;align-self:center;color:#CBD5E1;font-size:22px;user-select:none}
+  .legend{font-size:12px;color:var(--muted);margin-top:6px}
+  .legend b{font-weight:700}
+  .panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:16px 18px;margin-top:12px}
+  .panel.show{display:block}
+  .panel h3{margin:0 0 4px;font-size:16px}
+  .panel .desc{color:var(--muted);font-size:13.5px;margin:0 0 12px}
+  .skill{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-top:1px solid #F1F2F4}
+  .skill:first-of-type{border-top:none}
+  .skill .dot{font-weight:800;flex:0 0 auto;margin-top:1px}
+  .skill .body{flex:1}
+  .skill .nm{font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px}
+  .skill .use{color:var(--muted);font-size:13px}
+  .skill .gh{flex:0 0 auto;font-size:12.5px}
+  .panel .filterlink{display:inline-block;margin-top:12px;font-size:13px;font-weight:700}
+
+  /* vault */
+  .vault-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .vault-head h2{font-size:24px;font-weight:800;margin:0}
+  .vault-head .note{color:var(--faint);font-size:13px}
+  .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:14px 0 6px}
+  .search{flex:1 1 320px;display:flex;align-items:center;gap:8px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow)}
+  .search input{border:none;outline:none;width:100%;font-size:15px;background:transparent;color:var(--ink)}
+  .tabs{display:inline-flex;background:#EEF0F3;border-radius:11px;padding:3px}
+  .tab{border:none;background:transparent;padding:8px 16px;border-radius:9px;font-size:14px;font-weight:700;
+    color:var(--muted);cursor:pointer}
+  .tab.active{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+  .filterbar{display:flex;flex-wrap:wrap;gap:18px;margin:10px 0 4px;align-items:center}
+  .filterbar .grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .filterbar .lab{font-size:12.5px;font-weight:700;color:#374151}
+  .pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 13px;font-size:12.5px;
+    font-weight:600;color:var(--muted);cursor:pointer}
+  .pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px;margin:14px 0 18px}
+  .chip{background:var(--card);border:1px solid var(--line);border-radius:11px;box-shadow:var(--shadow);
+    padding:10px 12px 11px;cursor:pointer;position:relative;overflow:hidden}
+  .chip .tab-color{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:5px 0 0 5px}
+  .chip.active{outline:2px solid var(--ink);outline-offset:-1px}
+  .chip .cn{font-size:12.5px;font-weight:700;padding-left:6px;display:flex;justify-content:space-between;align-items:center}
+  .chip .cn b{font-size:18px}
+  .chip .bar{height:5px;border-radius:3px;background:#EEF0F3;margin:9px 0 0 6px;overflow:hidden}
+  .chip .bar i{display:block;height:100%;border-radius:3px}
+  .chip.dim{opacity:.5}
+
+  .count{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:18px;display:flex;flex-direction:column}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .card .meta{font-size:11.5px;color:var(--faint)}
+  .card .badges{display:flex;gap:6px;flex:0 0 auto}
+  .bdg{font-size:11px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .card h3{font-size:16.5px;font-weight:800;margin:10px 0 0;line-height:1.35}
+  .card h3 a{color:var(--ink)}
+  .card .stageline{font-size:12.5px;font-weight:700;margin-top:8px}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tagchip{font-size:11px;color:#475569;background:#F1F5F9;border-radius:6px;padding:3px 8px}
+  .card .foot{display:flex;gap:14px;align-items:center;margin-top:12px;padding-top:11px;border-top:1px solid #F1F2F4;
+    font-size:13px;flex-wrap:wrap}
+  .card .foot .exp{margin-left:auto;border:none;background:transparent;color:var(--s1);font-weight:700;
+    cursor:pointer;font-size:13px;padding:0}
+  .muted-link{color:var(--faint)}
+  .detail{display:none;margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+  .detail.show{display:block}
+  .dlabel{font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:1px;margin-top:10px}
+  .dtext{font-size:13.5px;color:#374151;margin-top:3px}
+  .hl{background:#FEF9EC;border:1px solid #F4D690;border-radius:10px;padding:11px 13px;margin-top:10px}
+  .hl .dlabel{color:#B45309;margin-top:0}
+  .hl .dtext{color:#92400E}
+  .empty{grid-column:1/-1;text-align:center;color:var(--faint);padding:40px;font-size:15px}
+
+  footer{margin-top:30px;color:var(--faint);font-size:12.5px;line-height:1.7}
+  #app-error{display:none;background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;border-radius:12px;
+    padding:16px 18px;margin:20px 0}
+  @media (max-width:640px){ h1{font-size:26px} .wrap{padding:18px 14px 50px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app-error">⚠️ 没读到数据。请在终端运行 <b>python3 dashboard/build.py</b> 把 pipeline.json 注入本页面后再打开。</div>
+
+  <div class="head">
+    <div>
+      <p class="kicker">RESEARCH PIPELINE · TEMPLATE</p>
+      <h1 id="title">科研流水线 · Paper Vault</h1>
+      <p class="sub" id="subtitle"></p>
+      <p class="sub" style="margin-top:6px"><a href="experiments.html" style="font-weight:700">🧪 实验进展板 / Experiments →</a></p>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="seclabel">六阶段流水线 / PIPELINE <span class="hint">（点击阶段查看挂载 skill）</span></div>
+  <div class="flow" id="flow"></div>
+  <div class="legend">徽标：<b style="color:var(--s6)">● installed</b>　　<b style="color:var(--s3)">🔒 只装不跑</b>　　<b style="color:var(--s5)">✏️ 改编</b></div>
+  <div class="panel" id="panel"></div>
+
+  <div class="seclabel" style="margin-top:34px">&nbsp;</div>
+  <div class="vault-head">
+    <h2>Paper Vault · 文献库</h2>
+    <span class="note" id="vaultnote"></span>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">🔍 <input id="search" placeholder="搜索 标题 / 作者 / 方法 / 标签 …"></div>
+    <div class="tabs">
+      <button class="tab active" data-view="stage">按阶段</button>
+      <button class="tab" data-view="topic">按主题</button>
+    </div>
+  </div>
+
+  <div class="filterbar">
+    <div class="grp"><span class="lab">状态</span><span id="statusPills"></span></div>
+    <div class="grp"><span class="lab">项目</span><span id="projectPills"></span></div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <p class="count" id="count"></p>
+  <div class="grid" id="grid"></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<!-- DATA:START -->
+<script id="pipeline-data" type="application/json">
+{
+  "meta": {
+    "title": "Research Pipeline",
+    "field": "（你的研究方向）· 前期文献调研 / 实验追踪 — 模板",
+    "owner": "（你的名字 / your name）",
+    "generated": "2026-06-02",
+    "skills_dir": ".claude/skills/",
+    "note": "看板从本文件读取渲染。以后只改这个 JSON，再跑 python3 dashboard/build.py 即可刷新看板。所有 note_path 路径相对项目根目录。",
+    "project": "（项目名占位）"
+  },
+  "status_legend": [
+    "待读",
+    "已调研",
+    "精读中",
+    "已笔记"
+  ],
+  "priority_legend": [
+    "High",
+    "Med",
+    "Low"
+  ],
+  "stages": [
+    {
+      "id": 1,
+      "name": "综合科研 & 综述",
+      "short": "综合科研",
+      "en": "REVIEW",
+      "dir": "01-review/",
+      "description": "选题、文献综述、论文规划、模拟审稿。",
+      "skills": [
+        {
+          "name": "academic-research-suite",
+          "repo": "Imbad0202/academic-research-skills-codex",
+          "url": "https://github.com/Imbad0202/academic-research-skills-codex",
+          "status": "installed",
+          "use": "学术研究套件：综述/选题/写作/模拟审稿/流程（含 /ars-* 命令别名；也含实验规划/统计解读）"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "文献雷达 & 文献库",
+      "short": "文献雷达",
+      "en": "RADAR",
+      "dir": "02-radar/",
+      "description": "按关键词监控 arXiv / Crossref / OpenAlex，把重点论文沉淀为本地可视化文献库。",
+      "skills": [
+        {
+          "name": "daily-literature-digest",
+          "repo": "xuezheng627/daily-literature-digest-skill",
+          "url": "https://github.com/xuezheng627/daily-literature-digest-skill",
+          "status": "installed",
+          "use": "按关键词监控 arXiv/Crossref/OpenAlex，发每日文献日报（Gmail 需自配）"
+        },
+        {
+          "name": "paper-vault",
+          "repo": "xuezheng627/research-radar-paper-vault",
+          "url": "https://github.com/xuezheng627/research-radar-paper-vault",
+          "status": "installed",
+          "use": "把重点论文沉淀为本地可搜索的卡片式文献库"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "文献下载",
+      "short": "文献下载",
+      "en": "ACQUIRE",
+      "dir": "03-acquired/",
+      "description": "在学校/机构合法权限内获取全文。两个 skill 只装不跑，由你手动触发，不绕过登录/付费墙。",
+      "skills": [
+        {
+          "name": "literature-downloader",
+          "repo": "Lucaswangzcx/literature-downloader-skill",
+          "url": "https://github.com/Lucaswangzcx/literature-downloader-skill",
+          "status": "installed-norun",
+          "use": "中文文献检索 + 合法全文获取（手动触发）"
+        },
+        {
+          "name": "sciencedirect-live-session-fetcher",
+          "repo": "Given-Dream/sciencedirect-live-session-fetcher",
+          "url": "https://github.com/Given-Dream/sciencedirect-live-session-fetcher",
+          "status": "installed-norun",
+          "use": "用你已登录的浏览器会话取 ScienceDirect PDF（手动触发）"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "文献精读",
+      "short": "文献精读",
+      "en": "READ",
+      "dir": "04-reading/",
+      "description": "解析 PDF、建本地文献库、产出证据驱动的精读笔记（HTML/MD）。",
+      "skills": [
+        {
+          "name": "auto-paper-skill",
+          "repo": "Zachary709/AutoPaperSkill",
+          "url": "https://github.com/Zachary709/AutoPaperSkill",
+          "status": "installed",
+          "use": "按方向/会议/DOI 找论文、去重、存库、解析 PDF 出报告"
+        },
+        {
+          "name": "literature-workflow",
+          "repo": "hwang847/codex-paper-reader",
+          "url": "https://github.com/hwang847/codex-paper-reader",
+          "status": "installed",
+          "use": "管理本地 PDF 文件夹、建索引、生成 HTML 精读笔记"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "实验 & 复现",
+      "short": "实验复现",
+      "en": "EXPERIMENT",
+      "dir": "05-experiments/",
+      "description": "复现基线、实现/调试方法、跑实验与消融、分析结果。注：真正的训练/仿真/eval 是你自己的代码库，本阶段 skill 负责「组织与驱动」实验，不替代训练栈。",
+      "skills": [
+        {
+          "name": "codex-autoresearch",
+          "repo": "leo-lilinxiao/codex-autoresearch",
+          "url": "https://github.com/leo-lilinxiao/codex-autoresearch",
+          "status": "installed",
+          "use": "无人值守的「改→验→留/弃」循环：复现、调参、跑到指标达标、通宵实验（harness 风格）"
+        },
+        {
+          "name": "results-analysis",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "分析实验结果、校验对比、把 eval 输出转成可入文的结果文字/图表/结论"
+        }
+      ],
+      "more_available": "重训练/仿真/eval 用你自己的代码库；可再补装 codex-academic 系实验 skill"
+    },
+    {
+      "id": 6,
+      "name": "写作 & 润色",
+      "short": "写作润色",
+      "en": "WRITE",
+      "dir": "06-writing/",
+      "description": "LaTeX/arXiv 与会议稿写作、科学写作规范、润色去 AI 味、reviewer 视角自检。",
+      "skills": [
+        {
+          "name": "arxiv-paper-writer",
+          "repo": "renocrypt/latex-arxiv-SKILL",
+          "url": "https://github.com/renocrypt/latex-arxiv-SKILL",
+          "status": "installed",
+          "use": "用 IEEEtran 写 arXiv 的 ML/AI 综述，管好 BibTeX 引用"
+        },
+        {
+          "name": "scientific-writing",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "按期刊规范写/改 manuscript 段落、摘要、图注"
+        },
+        {
+          "name": "conference-paper-writing",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "写/改 NeurIPS/ICML/ICLR/ACL/AAAI/COLM 风格会议论文"
+        },
+        {
+          "name": "paper-reviewer",
+          "repo": "Boom5426/Nature-Paper-Skills",
+          "url": "https://github.com/Boom5426/Nature-Paper-Skills",
+          "status": "installed",
+          "use": "以审稿人视角给稿子写 formal review"
+        },
+        {
+          "name": "awesome-ai-research-writing",
+          "repo": "zengrong233/awesome-ai-research-writing-skill",
+          "url": "https://github.com/zengrong233/awesome-ai-research-writing-skill",
+          "status": "installed",
+          "use": "中英写作/翻译/润色/去 AI 味/长句解释/reviewer 自检"
+        }
+      ],
+      "more_available": "Boom5426/Nature-Paper-Skills 另有 14 个子 skill；AAASS554/codex-academic-paper-skills 未装（精选取舍）"
+    },
+    {
+      "id": 7,
+      "name": "参考文献 & 展示",
+      "short": "参考展示",
+      "en": "DELIVER",
+      "dir": "07-delivery/",
+      "description": "参考文献与 BibTeX/RIS 格式化，论文汇报 PPT 生成。",
+      "skills": [
+        {
+          "name": "chinese-reference-formatter-skill",
+          "repo": "Zechang-Xiong/chinese-reference-formatter-skill",
+          "url": "https://github.com/Zechang-Xiong/chinese-reference-formatter-skill",
+          "status": "installed",
+          "use": "GB/T 7714 中文参考文献 + BibTeX 补全"
+        },
+        {
+          "name": "citation-ris-downloader",
+          "repo": "LiOH-1228/citation-ris-downloader",
+          "url": "https://github.com/LiOH-1228/citation-ris-downloader",
+          "status": "installed",
+          "use": "下载/校验/整理 RIS → Zotero/EndNote/Mendeley"
+        },
+        {
+          "name": "academic-slide-minimalist",
+          "repo": "fangyuanopus/literature-report-ppt-builder",
+          "url": "https://github.com/fangyuanopus/literature-report-ppt-builder",
+          "status": "adapted",
+          "use": "论文→文献汇报 PPT（≥20 页、只用论文真实图）"
+        }
+      ],
+      "more_available": "zxzin/codex-academic-delivery-skills（pptpro/final-delivery-clean 等）未装（精选取舍）"
+    }
+  ],
+  "papers": [
+    {
+      "id": "ecot-2024",
+      "title": "Robotic Control via Embodied Chain-of-Thought Reasoning (ECoT)",
+      "authors": "Zawalski, Chen, Pertsch, Mees, Finn, Levine",
+      "year": 2024,
+      "venue": "CoRL 2024",
+      "url": "https://arxiv.org/abs/2407.08693",
+      "stage": 4,
+      "status": "已笔记",
+      "priority": "High",
+      "topic": "具身推理 / Embodied Reasoning",
+      "tags": [
+        "ECoT",
+        "chain-of-thought",
+        "reasoning",
+        "VLA"
+      ],
+      "note_path": "04-reading/ecot-notes.md",
+      "detail": {
+        "fact": "ECoT:在 VLA 输出动作前,显式生成一段「具身推理链」(任务→子任务→可见物体→夹爪位置→运动方向),据此再出动作,把高层语义接地到低层控制;在 OpenVLA 上泛化任务绝对成功率 +28%,且不需额外机器人数据。",
+        "mytake": "（读完写你自己的判断：能偷什么、哪里不认同）"
+      },
+      "project": "示例 / example"
+    },
+    {
+      "id": "drivelm-2024",
+      "title": "DriveLM: Driving with Graph Visual Question Answering",
+      "authors": "Sima et al.",
+      "year": 2024,
+      "venue": "ECCV 2024",
+      "url": "https://arxiv.org/abs/2312.14150",
+      "stage": 2,
+      "status": "已调研",
+      "priority": "High",
+      "topic": "推理链监督 / Reasoning-Chain Supervision",
+      "tags": [
+        "driving",
+        "graph-VQA"
+      ],
+      "detail": {
+        "fact": "DriveLM:把驾驶决策组织成图结构的视觉问答(感知→预测→规划的推理链),证明「先推理再行动」在自动驾驶上有效;基于 nuScenes / CARLA 构建 DriveLM-Data 基准。",
+        "mytake": "（读完写你自己的判断：能偷什么、哪里不认同）"
+      },
+      "project": "示例 / example"
+    }
+  ]
+}
+</script>
+<!-- DATA:END -->
+
+<script>
+(function(){
+  var node = document.getElementById('pipeline-data');
+  var data = null;
+  try { data = JSON.parse((node.textContent||'').trim()); } catch(e){}
+  if(!data || !data.stages || !data.stages.length){ document.getElementById('app-error').style.display='block'; return; }
+
+  var PALETTE = ['#4F46E5','#0EA5E9','#F59E0B','#EF4444','#8B5CF6','#10B981','#DB2777'];
+  var colorOf = function(stageId){ return PALETTE[(stageId-1)%PALETTE.length]; };
+  var STATUS_STYLE = {'待读':['#F1F5F9','#475569'],'已调研':['#E0E7FF','#3730A3'],'精读中':['#FEF3C7','#92400E'],'已笔记':['#E0F2FE','#075985'],'已引用':['#DCFCE7','#166534']};
+  var PRI_STYLE = {'High':['#FEE2E2','#B91C1C'],'Med':['#FEF3C7','#92400E'],'Low':['#F1F5F9','#475569']};
+  var SKILL_BADGE = {'installed':['●','var(--s6)'],'installed-norun':['🔒','var(--s3)'],'adapted':['✏️','var(--s5)']};
+  var esc = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+
+  var state = { view:'stage', q:'', stage:null, topic:null, status:'全部', priority:'全部', project:'全部', expanded:{} };
+
+  // ---------- header ----------
+  document.getElementById('title').textContent = data.meta && data.meta.title ? data.meta.title : '科研流水线 · Paper Vault';
+  document.getElementById('subtitle').textContent = (data.meta && data.meta.field ? data.meta.field : '');
+  var totalSkills = data.stages.reduce(function(a,s){return a+(s.skills?s.skills.length:0);},0);
+  document.getElementById('stats').innerHTML =
+    stat(data.papers.length,'papers') + stat(totalSkills,'skills') + stat(data.stages.length,'stages');
+  function stat(n,l){ return '<div class="stat"><b>'+n+'</b><span>'+l+'</span></div>'; }
+  document.getElementById('vaultnote').textContent = '示例 '+data.papers.length+' 条 · 改 pipeline.json 后重建即增长';
+  document.getElementById('footer').innerHTML =
+    '数据来源：<b>paper-vault/pipeline.json</b> · 更新方式：改 JSON → 终端跑 <b>python3 dashboard/build.py</b> → 刷新本页。<br>'+
+    '单文件 · 纯前端 · 无服务器 / 无 localStorage / 无联网鉴权。';
+
+  // ---------- flow ----------
+  var flow = document.getElementById('flow');
+  data.stages.forEach(function(s,i){
+    if(i>0){ var a=document.createElement('span'); a.className='arrow'; a.textContent='→'; flow.appendChild(a); }
+    var c = colorOf(s.id);
+    var n = document.createElement('div');
+    n.className='node'; n.style.borderColor=c; n.dataset.id=s.id;
+    var lock = (s.skills||[]).some(function(k){return k.status==='installed-norun';}) ? ' 🔒' : '';
+    n.innerHTML = '<div class="num" style="background:'+c+'">'+s.id+'</div>'+
+      '<div class="nm">'+esc(s.short||s.name)+'</div>'+
+      '<div class="en">'+esc(s.en||'')+'</div>'+
+      '<div class="cnt" style="color:'+c+'">'+(s.skills?s.skills.length:0)+' skills'+lock+'</div>';
+    n.addEventListener('click', function(){ openStage(s.id); });
+    flow.appendChild(n);
+  });
+
+  var panel = document.getElementById('panel');
+  function openStage(id){
+    var s = data.stages.filter(function(x){return x.id===id;})[0];
+    var active = panel.classList.contains('show') && panel.dataset.id==String(id);
+    document.querySelectorAll('.node').forEach(function(el){ el.classList.remove('active'); el.style.background='#fff'; });
+    if(active){ panel.classList.remove('show'); panel.dataset.id=''; return; }
+    var c = colorOf(id);
+    var nd = document.querySelector('.node[data-id="'+id+'"]');
+    if(nd){ nd.classList.add('active'); nd.style.background = c+'14'; }
+    var rows = (s.skills||[]).map(function(k){
+      var b = SKILL_BADGE[k.status]||['●','var(--s6)'];
+      return '<div class="skill"><span class="dot" style="color:'+b[1]+'">'+b[0]+'</span>'+
+        '<div class="body"><div class="nm">'+esc(k.name)+'</div><div class="use">'+esc(k.use)+'</div></div>'+
+        '<a class="gh" href="'+esc(k.url)+'" target="_blank" rel="noopener">↗ github</a></div>';
+    }).join('');
+    var more = s.more_available ? '<div class="use" style="margin-top:10px;color:var(--faint)">更多可选：'+esc(s.more_available)+'</div>' : '';
+    panel.innerHTML = '<h3 style="color:'+c+'">阶段 '+id+' · '+esc(s.name)+'</h3>'+
+      '<p class="desc">'+esc(s.description)+'</p>'+rows+more+
+      '<a class="filterlink" href="javascript:void(0)" style="color:'+c+'" data-fstage="'+id+'">在文献库筛选本阶段 →</a>';
+    panel.classList.add('show'); panel.dataset.id=String(id);
+  }
+  panel.addEventListener('click', function(e){
+    var t = e.target.closest('[data-fstage]'); if(!t) return;
+    setView('stage'); state.stage = parseInt(t.dataset.fstage,10); renderChips(); renderCards();
+    document.querySelector('.vault-head').scrollIntoView({behavior:'smooth',block:'start'});
+  });
+
+  // ---------- pills ----------
+  function buildPills(host, items, key){
+    var all = ['全部'].concat(items);
+    document.getElementById(host).innerHTML = all.map(function(v){
+      return '<button class="pill'+(state[key]===v?' active':'')+'" data-k="'+key+'" data-v="'+esc(v)+'">'+esc(v)+'</button>';
+    }).join(' ');
+  }
+  buildPills('statusPills', data.status_legend||['待读','精读中','已笔记','已引用'], 'status');
+  var PROJECTS=[]; data.papers.forEach(function(p){ if(p.project && PROJECTS.indexOf(p.project)<0) PROJECTS.push(p.project); });
+  buildPills('projectPills', PROJECTS, 'project');
+  document.querySelector('.filterbar').addEventListener('click', function(e){
+    var b = e.target.closest('.pill'); if(!b) return;
+    state[b.dataset.k] = b.dataset.v;
+    buildPills('statusPills', data.status_legend||[], 'status');
+    buildPills('projectPills', PROJECTS, 'project');
+    renderCards();
+  });
+
+  // ---------- tabs ----------
+  document.querySelector('.tabs').addEventListener('click', function(e){
+    var b = e.target.closest('.tab'); if(!b) return; setView(b.dataset.view);
+  });
+  function setView(v){
+    state.view=v; state.stage=null; state.topic=null;
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.view===v); });
+    renderChips(); renderCards();
+  }
+
+  // ---------- chips ----------
+  function renderChips(){
+    var host = document.getElementById('chips'); var groups=[];
+    if(state.view==='stage'){
+      groups = data.stages.map(function(s){
+        return { key:s.id, label:(s.id+' '+(s.short||s.name)), color:colorOf(s.id),
+                 count:data.papers.filter(function(p){return p.stage===s.id;}).length, sel:state.stage===s.id };
+      });
+    } else {
+      var topics=[]; data.papers.forEach(function(p){ if(p.topic && topics.indexOf(p.topic)<0) topics.push(p.topic); });
+      groups = topics.map(function(t,i){
+        return { key:t, label:t, color:PALETTE[i%PALETTE.length],
+                 count:data.papers.filter(function(p){return p.topic===t;}).length, sel:state.topic===t };
+      });
+    }
+    var max = Math.max(1, Math.max.apply(null, groups.map(function(g){return g.count;}).concat([1])));
+    host.innerHTML = groups.map(function(g){
+      var pct = Math.round(g.count/max*100);
+      return '<div class="chip'+(g.sel?' active':'')+(g.count===0?' dim':'')+'" data-key="'+esc(g.key)+'">'+
+        '<span class="tab-color" style="background:'+g.color+'"></span>'+
+        '<div class="cn"><span>'+esc(g.label)+'</span><b style="color:'+(g.count?g.color:'var(--faint)')+'">'+g.count+'</b></div>'+
+        '<div class="bar"><i style="width:'+pct+'%;background:'+g.color+'"></i></div></div>';
+    }).join('');
+    host.querySelectorAll('.chip').forEach(function(ch){
+      ch.addEventListener('click', function(){
+        var k = ch.dataset.key;
+        if(state.view==='stage'){ var id=parseInt(k,10); state.stage = state.stage===id?null:id; }
+        else { state.topic = state.topic===k?null:k; }
+        renderChips(); renderCards();
+      });
+    });
+  }
+
+  // ---------- cards ----------
+  function visible(){
+    return data.papers.filter(function(p){
+      if(state.view==='stage' && state.stage && p.stage!==state.stage) return false;
+      if(state.view==='topic' && state.topic && p.topic!==state.topic) return false;
+      if(state.status!=='全部' && p.status!==state.status) return false;
+      if(state.project!=='全部' && (p.project||'')!==state.project) return false;
+      if(state.q){ var hay=[p.title,p.authors,p.venue,p.topic,(p.tags||[]).join(' ')].join(' ').toLowerCase();
+        if(hay.indexOf(state.q.toLowerCase())<0) return false; }
+      return true;
+    });
+  }
+  function stageName(id){ var s=data.stages.filter(function(x){return x.id===id;})[0]; return s?s.name:('阶段'+id); }
+
+  function renderCards(){
+    var list = visible(); var grid=document.getElementById('grid');
+    document.getElementById('count').textContent = '显示 '+list.length+' / '+data.papers.length+' 条';
+    if(!list.length){ grid.innerHTML='<div class="empty">没有匹配的论文。试试清掉筛选或改搜索词。</div>'; return; }
+    grid.innerHTML = list.map(function(p){
+      var ss=STATUS_STYLE[p.status]||['#F1F5F9','#475569'];
+      var statusBdg='<span class="bdg" style="background:'+ss[0]+';color:'+ss[1]+'">'+esc(p.status)+'</span>';
+      var projBdg=''; if(p.project){ var pci=Math.max(0,PROJECTS.indexOf(p.project)); var pcc=PALETTE[pci%PALETTE.length];
+        projBdg='<span class="bdg" style="background:'+pcc+'1A;color:'+pcc+'">'+esc(p.project)+'</span>'; }
+      var c=colorOf(p.stage);
+      var title = p.url ? '<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.title)+'</a>' : esc(p.title);
+      var tags=(p.tags||[]).map(function(t){return '<span class="tagchip">'+esc(t)+'</span>';}).join('');
+      var urlLink = p.url ? '<a href="'+esc(p.url)+'" target="_blank" rel="noopener">↗ '+(p.url.indexOf('arxiv')>-1?'arXiv':'链接')+'</a>'
+                          : '<span class="muted-link">↗ 链接待补</span>';
+      var noteLink = p.note_path ? '<a href="../'+esc(p.note_path)+'" target="_blank" rel="noopener">📝 笔记</a>'
+                          : '<span class="muted-link">📝 无笔记</span>';
+      var open = !!state.expanded[p.id];
+      var detail = renderDetail(p);
+      return '<div class="card">'+
+        '<div class="top"><div class="meta">'+esc(p.venue)+' · '+esc(p.year)+'</div>'+
+          '<div class="badges">'+projBdg+statusBdg+'</div></div>'+
+        '<h3>'+title+'</h3>'+
+        '<div class="stageline" style="color:'+c+'">阶段 '+p.stage+' · '+esc(stageName(p.stage))+'　·　'+esc(p.topic||'')+'</div>'+
+        '<div class="tags">'+tags+'</div>'+
+        '<div class="foot">'+urlLink+noteLink+
+          (detail?'<button class="exp" data-id="'+esc(p.id)+'">'+(open?'▲ 收起详情':'▼ 展开详情')+'</button>':'')+
+        '</div>'+
+        '<div class="detail'+(open?' show':'')+'" id="d-'+esc(p.id)+'">'+(detail||'')+'</div>'+
+      '</div>';
+    }).join('');
+    grid.querySelectorAll('.exp').forEach(function(b){
+      b.addEventListener('click', function(){ var id=b.dataset.id; state.expanded[id]=!state.expanded[id]; renderCards(); });
+    });
+  }
+  function renderDetail(p){
+    if(p.detail){
+      var d=p.detail; var out='';
+      if(d.fact) out+='<div class="dlabel">速览 / SUMMARY</div><div class="dtext">'+esc(d.fact)+'</div>';
+      out+='<div class="hl"><div class="dlabel">★ 我的判断（待补充）/ MY TAKE</div><div class="dtext">'+(d.mytake?esc(d.mytake):'<span style="color:var(--faint)">（待你补充）</span>')+'</div></div>';
+      return out;
+    }
+    if(p._todo){ return '<div class="dtext" style="color:var(--faint)">⚠ '+esc(p._todo)+'</div>'; }
+    return '';
+  }
+
+  renderChips(); renderCards();
+})();
+</script>
+</body>
+</html>
